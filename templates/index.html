@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SHADOW REALM DOWNLOADER</title>
+  <style>
+    /* Solo Leveling Inspired Styles - Shadow Realm Aesthetic */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    }
+    
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a0033 50%, #2d0066 100%);
+      padding: 24px;
+      color: #ffffff;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(86, 11, 173, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(41, 128, 185, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(142, 68, 173, 0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Main Card Container */
+    .shadow-realm-card {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(142, 68, 173, 0.3);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 
+        0 0 60px rgba(86, 11, 173, 0.3),
+        0 0 100px rgba(41, 128, 185, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shadow-realm-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(142, 68, 173, 0.8) 20%, 
+        rgba(41, 128, 185, 0.8) 80%, 
+        transparent 100%);
+    }
+
+    /* Header Styles */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #8e44ad 0%, #2980b9 50%, #3498db 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(142, 68, 173, 0.5);
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      color: #bdc3c7;
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 18px;
+      text-shadow: 0 0 10px rgba(189, 195, 199, 0.3);
+    }
+
+    /* Input and Button Styling */
+    .input-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    #url {
+      flex: 1;
+      padding: 18px 20px;
+      border: 1px solid rgba(142, 68, 173, 0.4);
+      border-radius: 8px;
+      background: rgba(20, 20, 35, 0.8);
+      color: #ffffff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #url::placeholder {
+      color: #7f8c8d;
+    }
+
+    #url:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 
+        0 0 20px rgba(41, 128, 185, 0.3),
+        inset 0 0 10px rgba(41, 128, 185, 0.1);
+    }
+
+    #fetch {
+      padding: 18px 32px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #8e44ad 0%, #2980b9 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 
+        0 0 20px rgba(142, 68, 173, 0.4),
+        0 0 40px rgba(41, 128, 185, 0.3);
+    }
+
+    #fetch:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 0 30px rgba(142, 68, 173, 0.6),
+        0 0 60px rgba(41, 128, 185, 0.4);
+    }
+
+    #fetch:active {
+      transform: translateY(0);
+    }
+
+    /* Error and Loader Styles */
+    .error {
+      display: none;
+      margin: 16px 0;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(231, 76, 60, 0.15);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #e74c3c;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+    }
+
+    .loader {
+      display: none;
+      margin: 24px 0;
+      text-align: center;
+      color: #3498db;
+      font-size: 1.1rem;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .loader::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #3498db;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Video Info Styling */
+    .video {
+      display: none;
+      margin-top: 24px;
+      background: rgba(20, 20, 35, 0.6);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(142, 68, 173, 0.2);
+      box-shadow: 
+        inset 0 0 20px rgba(0, 0, 0, 0.2),
+        0 0 30px rgba(142, 68, 173, 0.1);
+    }
+
+    .video .wrap {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .thumb {
+      flex: 1 1 280px;
+      min-width: 240px;
+      position: relative;
+    }
+
+    .thumb img {
+      width: 100%;
+      display: block;
+      border-radius: 0 0 12px 0;
+    }
+
+    .thumb::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, 
+        rgba(142, 68, 173, 0.1) 0%, 
+        rgba(41, 128, 185, 0.2) 100%);
+      pointer-events: none;
+    }
+
+    .meta {
+      flex: 2 1 400px;
+      padding: 24px;
+    }
+
+    .meta h3 {
+      color: #f1c40f;
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+      text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    }
+
+    .meta p {
+      color: #ecf0f1;
+      margin: 8px 0;
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    /* Formats Grid Styling */
+    .formats {
+      padding: 24px;
+      border-top: 1px solid rgba(142, 68, 173, 0.2);
+      background: rgba(15, 15, 25, 0.6);
+    }
+
+    .formats h3 {
+      color: #f1c40f;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .fmt {
+      background: linear-gradient(135deg, rgba(142, 68, 173, 0.1) 0%, rgba(41, 128, 185, 0.1) 100%);
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid rgba(142, 68, 173, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fmt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+      transition: left 0.5s ease;
+    }
+
+    .fmt:hover {
+      background: linear-gradient(135deg, rgba(142, 68, 173, 0.2) 0%, rgba(41, 128, 185, 0.2) 100%);
+      transform: translateY(-3px);
+      border-color: #2980b9;
+      box-shadow: 
+        0 0 25px rgba(142, 68, 173, 0.3),
+        0 0 40px rgba(41, 128, 185, 0.2);
+    }
+
+    .fmt:hover::before {
+      left: 100%;
+    }
+
+    .fmt div:first-child {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #f1c40f;
+      margin-bottom: 8px;
+      text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+    }
+
+    .fmt div:nth-child(2) {
+      color: #3498db;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .fmt div:last-child {
+      color: #bdc3c7;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Footer Styling */
+    footer {
+      margin-top: 32px;
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      text-shadow: 0 0 5px rgba(127, 140, 141, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .shadow-realm-card {
+        padding: 24px;
+      }
+      
+      .header h1 {
+        font-size: 2.2rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      #fetch {
+        width: 100%;
+      }
+      
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+      
+      .shadow-realm-card {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .meta {
+        padding: 16px;
+      }
+      
+      .formats {
+        padding: 16px;
+      }
+    }
+
+    /* Floating Particles Effect */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(142, 68, 173, 0.3);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.4;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Particles Background -->
+  <div class="particles" id="particles"></div>
+
+  <div class="shadow-realm-card">
+    <div class="header">
+      <h1>SHADOW REALM DOWNLOADER</h1>
+      <p>Enter a YouTube URL to extract its essence and claim your prize from the digital realm</p>
+    </div>
+
+    <div class="input-group">
+      <input id="url" type="text" placeholder="https://youtu.be/VIDEO_ID or https://www.youtube.com/watch?v=..."/>
+      <button id="fetch">SUMMON</button>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="loader" class="loader">Scanning the digital shadows...</div>
+
+    <div id="video" class="video">
+      <div class="wrap">
+        <div class="thumb"><img id="thumb" alt="Digital essence captured from the void" / src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c8957831-0b0d-46f1-982b-3298951e12a9.png"></div>
+        <div class="meta">
+          <h3 id="title"></h3>
+          <p id="uploader"></p>
+          <p id="duration"></p>
+        </div>
+      </div>
+      <div class="formats">
+        <h3>AVAILABLE VISIONS</h3>
+        <div id="grid" class="grid"></div>
+      </div>
+    </div>
+
+    <footer>Only for those who walk the path of shadows. Respect the digital realm's laws.</footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const API = ""; // Use empty string for same origin
+
+    // Create floating particles
+    function createParticles() {
+      const particles = $('particles');
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.width = Math.random() * 4 + 1 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.animationDuration = Math.random() * 10 + 5 + 's';
+        particles.appendChild(particle);
+      }
+    }
+
+    createParticles();
+
+    $("fetch").addEventListener("click", fetchInfo);
+    $("url").addEventListener("keypress", (e)=>{ if (e.key==="Enter") fetchInfo(); });
+
+    function show(el, visible){ el.style.display = visible ? "block" : "none"; }
+    function err(msg){ $("error").textContent = msg; show($("error"), true); }
+    function clearErr(){ show($("error"), false); }
+
+    function formatDuration(sec){
+      if (!sec && sec !== 0) return "Duration: Unknown";
+      const h = Math.floor(sec/3600);
+      const m = Math.floor((sec%3600)/60);
+      const s = sec%60;
+      return `Duration: ${h? h+":" : ""}${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    async function fetchInfo(){
+      const url = $("url").value.trim();
+      clearErr();
+      if (!url) { err("The void demands a valid URL to begin the ritual."); return; }
+      show($("loader"), true);
+      show($("video"), false);
+
+      try{
+        const res = await fetch(`${API}/api/videoinfo?url=${encodeURIComponent(url)}`);
+        if(!res.ok) throw new Error("Failed to commune with the digital realm");
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        $("title").textContent = data.title || "Untitled Vision";
+        $("uploader").textContent = `Creator: ${data.uploader || "Unknown Entity"}`;
+        $("duration").textContent = formatDuration(data.duration);
+        $("thumb").src = data.thumbnail || "";
+
+        const grid = $("grid");
+        grid.innerHTML = "";
+        data.formats.forEach(f=>{
+          const q = f.height ? `${f.height}p` : (f.audio_only ? "Audio Essence" : (f.format_note || "Format"));
+          const size = f.filesize ? `~${(f.filesize/1024/1024).toFixed(1)} MB` : "";
+          const div = document.createElement("div");
+          div.className = "fmt";
+          div.innerHTML = `<div>${q}</div>
+                           <div>${(f.ext||"").toUpperCase()}</div>
+                           <div>${size}</div>`;
+          div.addEventListener("click", ()=> {
+            const dl = document.createElement("a");
+            dl.href = `${API}/api/download?url=${encodeURIComponent(data.original_url)}`;
+            dl.setAttribute("download", "");
+            dl.target = "_blank";
+            document.body.appendChild(dl);
+            dl.click();
+            dl.remove();
+          });
+          grid.appendChild(div);
+        });
+
+        show($("video"), true);
+      }catch(e){
+        err(e.message || "The shadows whisper of an error in the ritual");
+      }finally{
+        show($("loader"), false);
+      }
+    }
+  </script>
+</body>
+</html>
+
